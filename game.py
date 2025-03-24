@@ -100,16 +100,16 @@ def show_main_menu():
     
     while True:
         print("\nMain Menu:")
-        print("1. Change settings")
-        print("2. Start game")
+        print("1. Start game")
+        print("2. Change settings")
         
         choice = input("Enter your choice (1-2): ")
         
-        if choice == "1":
+        if choice == "2":
             new_size = show_settings_menu()
             if new_size:
                 grid_size = new_size
-        elif choice == "2":
+        elif choice == "1":
             return grid_size
         else:
             print("Invalid choice. Please try again.")
