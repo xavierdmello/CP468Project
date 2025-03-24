@@ -1,21 +1,9 @@
 import time
 
-class Player:
-    def __init__(self, name, symbol):
-        self.name = name
-        self.symbol = symbol  # 'X' or 'O'
+from algorithm import AIPlayer
+from player import Player
 
-    def make_move(self, board):
-        while True:
-            try:
-                max_moves = board.size * board.size
-                move = int(input(f"{self.name}, enter number (1-{max_moves}): "))
-                if 1 <= move <= max_moves and board.is_valid_move(move):
-                    return move
-                else:
-                    print("Invalid move! Try again.")
-            except ValueError:
-                print(f"Please enter a number between 1 and {max_moves}!")
+
 
 class Board:
     def __init__(self, size=3):
@@ -74,6 +62,14 @@ class Board:
             if i < self.size - 1:  # don't print divider after the last row
                 print('-' * (self.size * (cell_width + 3) - 1))
 
+    def get_available_moves(self):
+        return [i * self.size + j + 1 for i in range(self.size) for j in range(self.size) if self.grid[i][j] == ' ']
+
+    def undo_move(self, move):
+        row = (move - 1) // self.size
+        col = (move - 1) % self.size
+        self.grid[row][col] = ' '
+
 def show_settings_menu():
     while True:
         print("\nSettings Menu:")
@@ -120,21 +116,41 @@ def main():
     # Show main menu and get grid size
     grid_size = show_main_menu()
     
+    print("\nChoose game mode:")
+    print("1. Human vs Human")
+    print("2. Human vs AI (Minimax)")
+    print("3. Human vs AI (Alpha-Beta)")
+    print("4. AI vs AI (Minimax vs Alpha-Beta)")
+
+    mode = input("Enter your choice (1-4): ")
+    while mode not in ["1", "2", "3", "4"]:
+        print("Invalid choice. Try again.")
+        mode = input("Enter your choice (1-4): ")
+
     player1 = Player("Player 1", "X")
     player2 = Player("Player 2", "O")
-    
+
+    if mode == "2":
+        player2 = AIPlayer("AI (Minimax)", "O")
+    elif mode == "3":
+        player2 = AIPlayer("AI (Alpha-Beta)", "O", use_alpha_beta=True)
+    elif mode == "4":
+        player1 = AIPlayer("AI (Minimax)", "X")
+        player2 = AIPlayer("AI (Alpha-Beta)", "O", use_alpha_beta=True)
+
     board = Board(grid_size)
     current_player = player1
-    
-    print(f"\nStarting game with {grid_size}x{grid_size} grid")
+
+    print(f"Starting game with {grid_size}x{grid_size} grid")
     print(f"Enter moves using numbers 1-{grid_size*grid_size}")
-    
+
     while True:
         board.display()
         time.sleep(1)
+
         move = current_player.make_move(board)
         board.make_move(move, current_player.symbol)
-        
+
         winner = board.check_winner()
         if winner:
             board.display()
@@ -143,8 +159,8 @@ def main():
             else:
                 print(f"{current_player.name} wins!")
             break
-            
-        # switch players
+
+        # Switch players
         current_player = player2 if current_player == player1 else player1
 
 if __name__ == "__main__":
