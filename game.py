@@ -2,6 +2,7 @@ import time
 
 from algorithm import AIPlayer
 from player import Player
+from gemini_player import GeminiPlayer
 
 
 
@@ -121,11 +122,14 @@ def main():
     print("2. Human vs AI (Minimax)")
     print("3. Human vs AI (Alpha-Beta)")
     print("4. AI vs AI (Minimax vs Alpha-Beta)")
+    print("5. Human vs Gemini API")
+    print("6. AI (Minimax) vs Gemini API")
+    print("7. AI (Alpha-Beta) vs Gemini API")
 
-    mode = input("Enter your choice (1-4): ")
-    while mode not in ["1", "2", "3", "4"]:
+    mode = input("Enter your choice (1-7): ")
+    while mode not in ["1", "2", "3", "4", "5", "6", "7"]:
         print("Invalid choice. Try again.")
-        mode = input("Enter your choice (1-4): ")
+        mode = input("Enter your choice (1-7): ")
 
     player1 = Player("Player 1", "X")
     player2 = Player("Player 2", "O")
@@ -137,6 +141,14 @@ def main():
     elif mode == "4":
         player1 = AIPlayer("AI (Minimax)", "X")
         player2 = AIPlayer("AI (Alpha-Beta)", "O", use_alpha_beta=True)
+    elif mode == "5":
+        player2 = GeminiPlayer("Gemini AI", "O")
+    elif mode == "6":
+        player1 = AIPlayer("AI (Minimax)", "X")
+        player2 = GeminiPlayer("Gemini AI", "O")
+    elif mode == "7":
+        player1 = AIPlayer("AI (Alpha-Beta)", "X", use_alpha_beta=True)
+        player2 = GeminiPlayer("Gemini AI", "O")
 
     board = Board(grid_size)
     current_player = player1
