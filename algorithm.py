@@ -7,6 +7,7 @@ class AIPlayer(Player):
     def __init__(self, name, symbol, use_alpha_beta=False):
         super().__init__(name, symbol)
         self.use_alpha_beta = use_alpha_beta
+        self.total_thinking_time = 0
 
     def make_move(self, board):
         print(f"{self.name} is thinking...")
@@ -77,6 +78,7 @@ class AIPlayer(Player):
     def find_best_move(self, board):
         best_score = -math.inf
         best_move = None
+        start_time = time.time()
         for move in board.get_available_moves():
             board.make_move(move, self.symbol)
             if self.use_alpha_beta:
@@ -87,4 +89,10 @@ class AIPlayer(Player):
             if score > best_score:
                 best_score = score
                 best_move = move
+
+        end_time = time.time()
+        thinking_time = end_time - start_time
+
+        self.total_thinking_time += thinking_time
+        print(f"{self.total_thinking_time:.6f} seconds total to decide.")
         return best_move
