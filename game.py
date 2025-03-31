@@ -1,9 +1,11 @@
-import time
 import random
+import time
 
 from algorithm import AIPlayer
 from player import Player
 from gemini_player import GeminiPlayer
+
+
 
 class Board:
     def __init__(self, size=3):
@@ -25,52 +27,45 @@ class Board:
         return False
 
     def check_winner(self):
+        # check rows
         for row in self.grid:
             if row.count(row[0]) == self.size and row[0] != ' ':
                 return row[0]
 
+        # check columns
         for col in range(self.size):
             if all(self.grid[row][col] == self.grid[0][col] != ' ' for row in range(self.size)):
                 return self.grid[0][col]
 
+        # check diagonals
         if all(self.grid[i][i] == self.grid[0][0] != ' ' for i in range(self.size)):
             return self.grid[0][0]
         if all(self.grid[i][self.size-1-i] == self.grid[0][self.size-1] != ' ' for i in range(self.size)):
             return self.grid[0][self.size-1]
 
+        # check tie
         if all(cell != ' ' for row in self.grid for cell in row):
             return 'Tie'
 
         return None
 
     def display(self):
-        print("\nCurrent Board:")
         max_width = len(str(self.size * self.size))  
-        cell_width = max(max_width, 3)  
+        cell_width = max(max_width, 3)  # Ensure at least 3 spaces for X and O centering
         for i, row in enumerate(self.grid):
             display_row = []
             for j, cell in enumerate(row):
                 if cell == ' ':
                     num = str(i * self.size + j + 1)
-                    display_row.append(num.rjust(cell_width))
+                    display_row.append(num.rjust(cell_width))  # right justify the number
                 else:
-                    display_row.append(cell.center(cell_width))
+                    display_row.append(cell.center(cell_width))  # center the X or O with consistent width
             print(' | '.join(display_row))
-            if i < self.size - 1:
+            if i < self.size - 1:  # don't print divider after the last row
                 print('-' * (self.size * (cell_width + 3) - 1))
 
     def get_available_moves(self):
         return [i * self.size + j + 1 for i in range(self.size) for j in range(self.size) if self.grid[i][j] == ' ']
-
-    def visualize_ai_decision(self, ai_player):
-        print("\nAI evaluating moves:")
-        move_scores = {}
-        for move in self.get_available_moves():
-            self.make_move(move, ai_player.symbol)
-            score = ai_player.evaluate_board(self)
-            move_scores[move] = score
-            self.undo_move(move)
-            print(f"Move {move}: Score {score}")
 
     def undo_move(self, move):
         row = (move - 1) // self.size
@@ -122,7 +117,7 @@ def main():
     
     # Show main menu and get grid size
     grid_size = show_main_menu()
-
+    
     print("\nChoose game mode:")
     print("1. Human vs Human")
     print("2. Human vs AI (Minimax)")
@@ -131,12 +126,13 @@ def main():
     print("5. Human vs Gemini API")
     print("6. AI (Minimax) vs Gemini API")
     print("7. AI (Alpha-Beta) vs Gemini API")
-    print("8. Gemini API vs Gemini API")
+    print("8. Human vs AI (Alpha-Beta with Visualization)")
+    print("9. AI (Minimax) vs AI (Alpha-Beta with Visualization)")
 
-    mode = input("Enter your choice (1-8): ")
-    while mode not in ["1", "2", "3", "4", "5", "6", "7", "8"]:
+    mode = input("Enter your choice (1-9): ")
+    while mode not in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
         print("Invalid choice. Try again.")
-        mode = input("Enter your choice (1-8): ")
+        mode = input("Enter your choice (1-9): ")
 
     player1 = Player("Player 1", "X")
     player2 = Player("Player 2", "O")
@@ -157,16 +153,20 @@ def main():
         player1 = AIPlayer("AI (Alpha-Beta)", "X", use_alpha_beta=True)
         player2 = GeminiPlayer("Gemini AI", "O")
     elif mode == "8":
-        player2 = GeminiPlayer("Gemini 2", "O")
-        player1 = GeminiPlayer("Gemini 1", "X")
+        player2 = AIPlayer("AI (Alpha-Beta with Visualization)", "O", use_alpha_beta=True, visualize_pruning=True)
+    elif mode == "9":
+        player1 = AIPlayer("AI (Minimax)", "X")
+        player2 = AIPlayer("AI (Alpha-Beta with Visualization)", "O", use_alpha_beta=True, visualize_pruning=True)
 
-    print("\nChoosing starting AI player randomly...\n")
+
     if isinstance(player1, (AIPlayer, GeminiPlayer)) and isinstance(player2, (AIPlayer, GeminiPlayer)):
+        print("\nChoosing starting AI player randomly...\n")
         if random.choice([True, False]):
             player1, player2 = player2, player1
 
     board = Board(grid_size)
     current_player = player1
+    second_player = player2
 
     print(f"Starting game with {grid_size}x{grid_size} grid")
     print(f"Enter moves using numbers 1-{grid_size*grid_size}")
@@ -174,8 +174,7 @@ def main():
     while True:
         board.display()
         time.sleep(1)
-        if isinstance(current_player, AIPlayer):
-            board.visualize_ai_decision(current_player)
+
         move = current_player.make_move(board)
         board.make_move(move, current_player.symbol)
 
@@ -183,7 +182,7 @@ def main():
         if winner:
             board.display()
             if winner == 'Tie':
-                print("It's a tie!")
+                print(f"It's a tie! \n(Player 1 took {current_player.total_thinking_time:.6} seconds)\n(Player 2 took {second_player.total_thinking_time:.6} seconds)")
             else:
                 print(f"{current_player.name} wins! ({current_player.total_thinking_time:.6} seconds.)")
             break
