@@ -12,9 +12,11 @@ class GeminiPlayer(Player):
         super().__init__(name, symbol)
         self.model_name = model_name
         self.model = genai.GenerativeModel(model_name)
+        self.total_thinking_time = 0
         
     def make_move(self, board):
         print(f"{self.name} is thinking...")
+        start_time = time.time()
         time.sleep(1)
         
         # format the current board state for the prompt
@@ -51,15 +53,18 @@ class GeminiPlayer(Player):
             # extract the move number from the response
             for word in move_text.split():
                 if word.isdigit() and int(word) in available_moves:
+                    self.time_calculation(start_time)
                     return int(word)
             
             # if no valid move found in response, choose first available move
             print(f"gemini api didn't return a valid move. using first available move.")
+            self.time_calculation(start_time)
             return available_moves[0]
             
         except Exception as e:
             print(f"error communicating with gemini api: {e}")
             print("choosing first available move instead.")
+            self.time_calculation(start_time)
             return available_moves[0]
     
     def _format_board_for_prompt(self, board):
@@ -69,4 +74,10 @@ class GeminiPlayer(Player):
             formatted_board += " | ".join(row) + "\n"
             if i < board.size - 1:
                 formatted_board += "-" * (board.size * 3 + (board.size - 1) * 2) + "\n"
-        return formatted_board 
+        return formatted_board
+
+    def time_calculation(self, start_time):
+        end_time = time.time()
+        thinking_time = end_time - start_time
+        self.total_thinking_time += thinking_time
+        print(f"{self.total_thinking_time:.6f} seconds total to decide, {thinking_time:.6f} seconds thinking.")
