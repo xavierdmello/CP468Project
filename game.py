@@ -1,3 +1,4 @@
+import random
 import time
 
 from algorithm import AIPlayer
@@ -125,11 +126,13 @@ def main():
     print("5. Human vs Gemini API")
     print("6. AI (Minimax) vs Gemini API")
     print("7. AI (Alpha-Beta) vs Gemini API")
+    print("8. Human vs AI (Alpha-Beta with Visualization)")
+    print("9. AI (Minimax) vs AI (Alpha-Beta with Visualization)")
 
-    mode = input("Enter your choice (1-7): ")
-    while mode not in ["1", "2", "3", "4", "5", "6", "7"]:
+    mode = input("Enter your choice (1-9): ")
+    while mode not in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
         print("Invalid choice. Try again.")
-        mode = input("Enter your choice (1-7): ")
+        mode = input("Enter your choice (1-9): ")
 
     player1 = Player("Player 1", "X")
     player2 = Player("Player 2", "O")
@@ -149,9 +152,21 @@ def main():
     elif mode == "7":
         player1 = AIPlayer("AI (Alpha-Beta)", "X", use_alpha_beta=True)
         player2 = GeminiPlayer("Gemini AI", "O")
+    elif mode == "8":
+        player2 = AIPlayer("AI (Alpha-Beta with Visualization)", "O", use_alpha_beta=True, visualize_pruning=True)
+    elif mode == "9":
+        player1 = AIPlayer("AI (Minimax)", "X")
+        player2 = AIPlayer("AI (Alpha-Beta with Visualization)", "O", use_alpha_beta=True, visualize_pruning=True)
+
+
+    if isinstance(player1, (AIPlayer, GeminiPlayer)) and isinstance(player2, (AIPlayer, GeminiPlayer)):
+        print("\nChoosing starting AI player randomly...\n")
+        if random.choice([True, False]):
+            player1, player2 = player2, player1
 
     board = Board(grid_size)
     current_player = player1
+    second_player = player2
 
     print(f"Starting game with {grid_size}x{grid_size} grid")
     print(f"Enter moves using numbers 1-{grid_size*grid_size}")
@@ -167,9 +182,9 @@ def main():
         if winner:
             board.display()
             if winner == 'Tie':
-                print("It's a tie!")
+                print(f"It's a tie! \n(Player 1 took {current_player.total_thinking_time:.6} seconds)\n(Player 2 took {second_player.total_thinking_time:.6} seconds)")
             else:
-                print(f"{current_player.name} wins!")
+                print(f"{current_player.name} wins! ({current_player.total_thinking_time:.6} seconds.)")
             break
 
         # Switch players
