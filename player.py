@@ -11,8 +11,8 @@ class Player:
         while True:
             try:
                 max_moves = board.size * board.size
-                move = int(input(f"{self.name}, enter number (1-{max_moves}): "))
                 start_time = time.time()
+                move = int(input(f"{self.name}, enter number (1-{max_moves}): "))
                 if 1 <= move <= max_moves and board.is_valid_move(move):
                     end_time = time.time()
                     thinking_time = end_time - start_time
