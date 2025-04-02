@@ -12,12 +12,12 @@ class Board:
         self.size = size
         self.grid = [[' ' for _ in range(size)] for _ in range(size)]
         self.current_player = None
-
+        # grid size 
     def is_valid_move(self, move):
         row = (move - 1) // self.size
         col = (move - 1) % self.size
         return self.grid[row][col] == ' '
-
+        # checks to see if move is valid
     def make_move(self, move, symbol):
         row = (move - 1) // self.size
         col = (move - 1) % self.size
@@ -25,13 +25,13 @@ class Board:
             self.grid[row][col] = symbol
             return True
         return False
-
+        # changes printed grid to show moves made
     def check_winner(self):
         # check rows
         for row in self.grid:
             if row.count(row[0]) == self.size and row[0] != ' ':
                 return row[0]
-
+        
         # check columns
         for col in range(self.size):
             if all(self.grid[row][col] == self.grid[0][col] != ' ' for row in range(self.size)):
@@ -92,7 +92,7 @@ def show_settings_menu():
             return None
         else:
             print("Invalid choice. Please try again.")
-
+    # settings menu
 def show_main_menu():
     grid_size = 3  # Default grid size
     
@@ -157,13 +157,14 @@ def main():
     elif mode == "9":
         player1 = AIPlayer("AI (Minimax)", "X")
         player2 = AIPlayer("AI (Alpha-Beta with Visualization)", "O", use_alpha_beta=True, visualize_pruning=True)
-
+    # chooses game style depending on user input
 
     if isinstance(player1, (AIPlayer, GeminiPlayer)) and isinstance(player2, (AIPlayer, GeminiPlayer)):
         print("\nChoosing starting AI player randomly...\n")
         if random.choice([True, False]):
             player1, player2 = player2, player1
-
+    # if both players are AI it will randomly choose a starting player
+    
     board = Board(grid_size)
     current_player = player1
     second_player = player2
