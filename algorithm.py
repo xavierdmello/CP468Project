@@ -12,6 +12,7 @@ class AIPlayer(Player):
         self.total_thinking_time = 0
         if visualize_pruning:
             self.visualizer = PruningVisualizer()
+        # AI player class
 
     def make_move(self, board):
         print(f"{self.name} is thinking...")
@@ -22,9 +23,10 @@ class AIPlayer(Player):
             self.visualizer.reset()
             
         best_move = self.find_best_move(board)
-        
+        # function call to make move using Minimax/Alphabeta
         if self.visualize_pruning and self.use_alpha_beta:
             self.visualizer.visualize(f"{self.name} - Alpha-Beta Pruning Analysis")
+        # check for visualizer mode
             
         return best_move
 
@@ -36,6 +38,7 @@ class AIPlayer(Player):
             return depth - 10
         elif winner == 'Tie':
             return 0
+        # check to see if player has won
         
         if is_maximizing:
             best_score = -math.inf
@@ -54,6 +57,7 @@ class AIPlayer(Player):
                 board.undo_move(move)
                 best_score = min(best_score, score)
             return best_score
+        # Minimax algoritim 
 
     def alpha_beta_pruning(self, board, depth, alpha, beta, is_maximizing, parent_node=None):
         # Create a node for the current state if visualizing
@@ -183,4 +187,5 @@ class AIPlayer(Player):
         thinking_time = end_time - start_time
         self.total_thinking_time += thinking_time
         print(f"{self.total_thinking_time:.6f} seconds total to decide, {thinking_time:.6f} seconds thinking.")
+        # time tracking for move calculation
         return best_move
