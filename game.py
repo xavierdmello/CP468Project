@@ -77,15 +77,15 @@ def show_settings_menu():
         print("\nSettings Menu:")
         print("1. Change grid size")
         print("2. Go back")
-        
+
         choice = input("Enter your choice (1-2): ")
         if choice == "1":
             while True:
                 try:
-                    size = int(input("Enter new grid size (3-5): "))
-                    if 3 <= size <= 5:
+                    size = int(input("Enter new grid size (3, 10, or 15): "))
+                    if size in [3, 10, 15]:
                         return size
-                    print("Please enter a size between 3 and 5.")
+                    print("Please enter 3, 10, or 15.")
                 except ValueError:
                     print("Please enter a valid number.")
         elif choice == "2":
@@ -187,7 +187,6 @@ def main():
                 print(f"{current_player.name} wins! ({current_player.total_thinking_time:.6} seconds.)")
             break
 
-        # Switch players
         current_player = player2 if current_player == player1 else player1
 
 if __name__ == "__main__":
